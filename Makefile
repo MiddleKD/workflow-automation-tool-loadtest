@@ -37,4 +37,10 @@ ollama-down:
 langchain:
 	uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir langchain
 
-.PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-log ollama-down langchain
+n8n-pdf-init:
+	curl -X POST --data-binary @pdfs/sample.pdf -H "Content-Type: application/pdf" http://localhost:5678/webhook-test/b1ce616a-a54b-4ea9-8b13-1055fdd6db75
+
+loadtest:
+	locust -f loadtest.py --host=http://localhost:8000
+
+.PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-log ollama-down langchain n8n-pdf-init loadtest

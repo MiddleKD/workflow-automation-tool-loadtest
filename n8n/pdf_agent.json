@@ -1,0 +1,347 @@
+{
+  "name": "pdf agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "18495ef3-f041-4627-bb33-ac5b277cb763",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        -140
+      ],
+      "id": "c4ffbed1-3e67-4d63-abd4-c83aa228bd00",
+      "name": "Webhook",
+      "webhookId": "18495ef3-f041-4627-bb33-ac5b277cb763"
+    },
+    {
+      "parameters": {
+        "memoryKey": "n8n_pdf_store"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.1,
+      "position": [
+        300,
+        80
+      ],
+      "id": "9619892b-adc0-4a09-9662-257af5dd1134",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {
+        "topK": "={{ $('Webhook').item.json.body.top_k }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -80
+      ],
+      "id": "be2fbcea-0a72-49f4-9f2b-99aeef631091",
+      "name": "Vector Store Retriever"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.query }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1.5,
+      "position": [
+        140,
+        -340
+      ],
+      "id": "3ef6d74a-3213-4ada-8720-cf2b4ee4ffff",
+      "name": "Question and Answer Chain"
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        100,
+        -20
+      ],
+      "id": "dc48a4a3-464a-4a9c-9aef-37adbf9de548",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "MWpttS3so5X2v0aW",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        240,
+        220
+      ],
+      "id": "1d9c06ee-fe9c-4a5b-a0a5-de261c33513b",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "MWpttS3so5X2v0aW",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        -340
+      ],
+      "id": "e91bad43-62c1-4486-8f3c-b12248234adb",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b1ce616a-a54b-4ea9-8b13-1055fdd6db75",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -140,
+        400
+      ],
+      "id": "f0e074c5-8f1e-4783-af02-1b52f6726686",
+      "name": "Webhook1",
+      "webhookId": "b1ce616a-a54b-4ea9-8b13-1055fdd6db75"
+    },
+    {
+      "parameters": {
+        "model": "llama3.1:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        400,
+        620
+      ],
+      "id": "6c49a8b8-7ef6-494b-9ea8-3e84a98702ea",
+      "name": "Embeddings Ollama1",
+      "credentials": {
+        "ollamaApi": {
+          "id": "MWpttS3so5X2v0aW",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": "n8n_pdf_store"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.1,
+      "position": [
+        440,
+        400
+      ],
+      "id": "bf89e4ee-8744-4a13-893d-76962401418f",
+      "name": "Simple Vector Store2"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        580,
+        640
+      ],
+      "id": "f99c61de-444e-46b2-8750-0587e41f82f7",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 600,
+        "chunkOverlap": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
+      "typeVersion": 1,
+      "position": [
+        540,
+        800
+      ],
+      "id": "5b48df28-7f98-4cff-b8d6-88bfd870a352",
+      "name": "Token Splitter"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        140,
+        400
+      ],
+      "id": "d01afcea-d0c1-48cb-aa27-121693cb9dd9",
+      "name": "Extract from File"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Question and Answer Chain": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Token Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Vector Store2": {
+      "main": [
+        []
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "53198656-88d9-4a09-a806-f5edb68ab662",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "cd761a66662a6ed34186713f65997734ec72fbd8c22d9ea769b294841dcbbc8a"
+  },
+  "id": "4krg7Y1OrhPwbaPs",
+  "tags": []
+}
