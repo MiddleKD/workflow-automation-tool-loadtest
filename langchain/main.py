@@ -9,6 +9,7 @@ from langchain_core.documents import Document
 
 from rag import PDFRetrievalChain
 import config
+from langchain_community.llms.ollama import Ollama
 
 load_dotenv()
 
@@ -71,6 +72,34 @@ async def hybrid_search(request: SearchRequest):
     try:
         results = rag_chain.search_hybrid(request.query, request.top_k)
         return format_search_results(results)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/chat")
+async def chat(request: SearchRequest):
+    """
+    질의(query)에 대해 PDF에서 semantic_search를 자동으로 실행하고,
+    검색 결과를 context로 하여 LLM(ollama)에게 답변을 생성하게 합니다.
+    """
+    try:
+        # 1. semantic search로 context 추출
+        context_results = rag_chain.search_semantic(request.query, request.top_k)
+        context_text = "\n".join([doc.page_content for doc in context_results])
+        # 2. LLM 프롬프트 구성
+        prompt = f"""
+        [문서 요약 및 답변 생성]
+        아래는 사용자의 질문입니다.
+        질문: {request.query}
+        ---
+        아래는 관련 PDF에서 추출된 문서 내용입니다.
+        {context_text}
+        ---
+        위 문서 내용을 참고하여 질문에 대해 친절하게 답변해 주세요.
+        """
+        llm = Ollama(model=config.DEFAULT_LLM)
+        answer = llm.invoke(prompt)
+        return answer
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
