@@ -3,12 +3,15 @@ n8n-up:
 	  -v $(PWD)/n8n/datas:/home/node/.n8n \
 	  docker.n8n.io/n8nio/n8n:latest
 
+n8n-log:
+	docker logs -f n8n
+
 n8n-down:
 	docker stop n8n || true
 
-# dify components
+
 dify-up:
-	docker compose -f dify/docker/docker-compose.yaml up
+	docker compose --env-file dify/.env -f dify/docker/docker-compose.yaml up
 
 dify-log:
 	docker compose -f dify/docker/docker-compose.yaml logs -f
@@ -16,4 +19,20 @@ dify-log:
 dify-down:
 	docker compose -f dify/docker/docker-compose.yaml down
 
-.PHONY: n8n-up n8n-down dify-up dify-down
+
+ollama-up:
+	docker run -d --gpus=all \
+	  -v /home/middlek/Desktop/mnt/sda/models/ollama:/root/.ollama \
+	  -v ./modelfiles:/root/modelfiles \
+	  -p 11434:11434 \
+	  -e OLLAMA_KV_CACHE_TYPE=1 \
+	  -e OLLAMA_NUM_PARALLEL=16 \
+	  --name ollama \
+	  ollama/ollama
+
+ollama-down:
+	docker stop ollama || true
+	docker rm ollama || true
+
+
+.PHONY: n8n-up n8n-down dify-up dify-down ollama-up ollama-log ollama-down
