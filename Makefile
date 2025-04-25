@@ -23,7 +23,7 @@ dify-down:
 ollama-up:
 	docker run -d --gpus=all \
 	  -v /home/middlek/Desktop/mnt/sda/models/ollama:/root/.ollama \
-	  -v ./modelfiles:/root/modelfiles \
+	  -v ./ollama/modelfiles:/root/modelfiles \
 	  -p 11434:11434 \
 	  -e OLLAMA_KV_CACHE_TYPE=1 \
 	  -e OLLAMA_NUM_PARALLEL=16 \
@@ -34,5 +34,7 @@ ollama-down:
 	docker stop ollama || true
 	docker rm ollama || true
 
+langchain:
+	uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir langchain
 
-.PHONY: n8n-up n8n-down dify-up dify-down ollama-up ollama-log ollama-down
+.PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-log ollama-down langchain
