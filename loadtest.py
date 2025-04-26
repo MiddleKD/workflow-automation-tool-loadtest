@@ -2,7 +2,7 @@ import os
 import random
 
 from dotenv import load_dotenv
-from locust import HttpUser, between, task
+from locust import HttpUser, constant, task
 
 from constant import DIFY_HOST, LANGCHAIN_HOST, N8N_HOST
 
@@ -17,13 +17,13 @@ QUERIES = [
 ]
 
 DIFY_HEADERS = {
-    "Authorization": f"Bearer {os.getenv('DIFY_API_KEY')}",
+    "Authorization": f"Bearer {os.getenv('DIFY_API')}",
     "Content-Type": "application/json",
 }
 
 
 class LangchainUser(HttpUser):
-    wait_time = between(1, 2)  # 각 요청 사이 대기시간(초)
+    wait_time = constant(3)  # 각 요청 사이 대기시간(초)
     host = LANGCHAIN_HOST
 
     @task
@@ -40,7 +40,7 @@ class LangchainUser(HttpUser):
 
 
 class N8NUser(HttpUser):
-    wait_time = between(1, 2)  # 각 요청 사이 대기시간(초)
+    wait_time = constant(3)  # 각 요청 사이 대기시간(초)
     host = N8N_HOST
 
     @task
@@ -59,7 +59,7 @@ class N8NUser(HttpUser):
 
 
 class DifyUser(HttpUser):
-    wait_time = between(1, 2)  # 각 요청 사이 대기시간(초)
+    wait_time = constant(3)  # 각 요청 사이 대기시간(초)
     host = DIFY_HOST
 
     @task

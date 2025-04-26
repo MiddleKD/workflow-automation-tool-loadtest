@@ -5,8 +5,8 @@ from typing import List
 import config
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from langchain_ollama import OllamaLLM
 from langchain_core.documents import Document
+from langchain_ollama import OllamaLLM
 from pydantic import BaseModel
 from rag import PDFRetrievalChain
 

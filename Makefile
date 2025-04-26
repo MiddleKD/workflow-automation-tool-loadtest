@@ -1,7 +1,8 @@
 n8n-up:
 	docker run -it --rm --name n8n -p 5678:5678 --network host \
-	  -v $(PWD)/n8n/datas:/home/node/.n8n \
-	  docker.n8n.io/n8nio/n8n:latest
+		-e EXECUTIONS_TIMEOUT=30 \
+		-v $(PWD)/n8n/datas:/home/node/.n8n \
+		docker.n8n.io/n8nio/n8n:latest
 
 n8n-log:
 	docker logs -f n8n
@@ -35,7 +36,7 @@ ollama-down:
 	docker rm ollama || true
 
 langchain-up:
-	uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir langchain
+	gunicorn main:app -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --chdir langchain --timeout 30
 
 n8n-pdf-init:
 	curl -X POST --data-binary @pdfs/sample.pdf -H "Content-Type: application/pdf" http://localhost:5678/webhook/upload
@@ -54,9 +55,7 @@ loadtest:
 	esac
 
 qdrant-up:
-	docker run -d --name qdrant -p 6333:6333 -p 6334:6334 \
-	  -v $(PWD)/vector_db:/qdrant/storage \
-	  qdrant/qdrant
+	docker run --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
 
 qdrant-down:
 	docker stop qdrant || true

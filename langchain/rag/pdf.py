@@ -1,13 +1,14 @@
 import os
 from typing import Any, List
 
+from config import DEFAULT_CHUNK_OVERLAP, DEFAULT_CHUNK_SIZE
 from langchain_community.document_loaders import PDFPlumberLoader
+from langchain_community.vectorstores import Qdrant
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Qdrant
 from qdrant_client import QdrantClient
 from rag.base import RetrievalChain
-from config import DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP
+
 
 class PDFRetrievalChain(RetrievalChain):
     """
@@ -17,9 +18,7 @@ class PDFRetrievalChain(RetrievalChain):
     for retrieval.
     """
 
-    def __init__(
-        self, source_uri: List[str], **kwargs
-    ) -> None:
+    def __init__(self, source_uri: List[str], **kwargs) -> None:
         """
         Initialize a PDF retrieval chain.
 
@@ -28,9 +27,7 @@ class PDFRetrievalChain(RetrievalChain):
             **kwargs: Additional keyword arguments for the base RetrievalChain
         """
 
-        super().__init__(
-            source_uri=source_uri, **kwargs
-        )
+        super().__init__(source_uri=source_uri, **kwargs)
 
     def load_documents(self, source_uris: List[str]) -> List[Document]:
         """
@@ -63,7 +60,9 @@ class PDFRetrievalChain(RetrievalChain):
             A text splitter instance suitable for PDFs
         """
 
-        return RecursiveCharacterTextSplitter(chunk_size=DEFAULT_CHUNK_SIZE, chunk_overlap=DEFAULT_CHUNK_OVERLAP)
+        return RecursiveCharacterTextSplitter(
+            chunk_size=DEFAULT_CHUNK_SIZE, chunk_overlap=DEFAULT_CHUNK_OVERLAP
+        )
 
     def create_vectorstore(self, split_docs: List[Document]) -> Any:
         """
