@@ -38,9 +38,19 @@ langchain:
 	uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir langchain
 
 n8n-pdf-init:
-	curl -X POST --data-binary @pdfs/sample.pdf -H "Content-Type: application/pdf" http://localhost:5678/webhook-test/b1ce616a-a54b-4ea9-8b13-1055fdd6db75
+	curl -X POST --data-binary @pdfs/sample.pdf -H "Content-Type: application/pdf" http://localhost:5678/webhook/upload
 
 loadtest:
-	locust -f loadtest.py --host=http://localhost:8000
+	@echo "Select target user:"
+	@echo "1) LangchainUser"
+	@echo "2) N8NUser"
+	@echo "3) DifyUser"
+	@read -p "Enter the number: " num; \
+	case $$num in \
+		1) uv run locust -f loadtest.py LangchainUser ;; \
+		2) uv run locust -f loadtest.py N8NUser ;; \
+		3) uv run locust -f loadtest.py DifyUser ;; \
+		*) echo "Invalid input" ;; \
+	esac
 
 .PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-log ollama-down langchain n8n-pdf-init loadtest
