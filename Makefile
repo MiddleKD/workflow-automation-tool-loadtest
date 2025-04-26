@@ -53,4 +53,13 @@ loadtest:
 		*) echo "Invalid input" ;; \
 	esac
 
-.PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-log ollama-down langchain-up n8n-pdf-init loadtest
+qdrant-up:
+	docker run -d --name qdrant -p 6333:6333 -p 6334:6334 \
+	  -v $(PWD)/vector_db:/qdrant/storage \
+	  qdrant/qdrant
+
+qdrant-down:
+	docker stop qdrant || true
+	docker rm qdrant || true
+
+.PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-down langchain-up n8n-pdf-init loadtest qdrant-up qdrant-down

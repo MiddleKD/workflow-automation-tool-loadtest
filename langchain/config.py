@@ -2,7 +2,6 @@ from pathlib import Path
 
 # Path settings
 DATA_DIR = Path(__file__).parent.parent / "pdfs"
-VECTOR_DIR = Path(__file__).parent / "vector_db"
 
 # Default settings
 DEFAULT_CHUNK_SIZE = 600

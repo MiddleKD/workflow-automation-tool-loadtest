@@ -1,12 +1,13 @@
 import os
-from typing import Any, List, Optional
+from typing import Any, List
 
-from langchain_chroma import Chroma
 from langchain_community.document_loaders import PDFPlumberLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Qdrant
+from qdrant_client import QdrantClient
 from rag.base import RetrievalChain
-
+from config import DEFAULT_CHUNK_SIZE, DEFAULT_CHUNK_OVERLAP
 
 class PDFRetrievalChain(RetrievalChain):
     """
@@ -17,19 +18,18 @@ class PDFRetrievalChain(RetrievalChain):
     """
 
     def __init__(
-        self, source_uri: List[str], persist_directory: Optional[str] = None, **kwargs
+        self, source_uri: List[str], **kwargs
     ) -> None:
         """
         Initialize a PDF retrieval chain.
 
         Args:
             source_uri: List of PDF file paths
-            persist_directory: Directory to persist vector store
             **kwargs: Additional keyword arguments for the base RetrievalChain
         """
 
         super().__init__(
-            source_uri=source_uri, persist_directory=persist_directory, **kwargs
+            source_uri=source_uri, **kwargs
         )
 
     def load_documents(self, source_uris: List[str]) -> List[Document]:
@@ -63,11 +63,11 @@ class PDFRetrievalChain(RetrievalChain):
             A text splitter instance suitable for PDFs
         """
 
-        return RecursiveCharacterTextSplitter(chunk_size=600, chunk_overlap=50)
+        return RecursiveCharacterTextSplitter(chunk_size=DEFAULT_CHUNK_SIZE, chunk_overlap=DEFAULT_CHUNK_OVERLAP)
 
     def create_vectorstore(self, split_docs: List[Document]) -> Any:
         """
-        Create a vector store from split PDF documents.
+        Create a vector store from split PDF documents using Qdrant.
 
         Args:
             split_docs: Split document chunks
@@ -82,25 +82,21 @@ class PDFRetrievalChain(RetrievalChain):
         if not split_docs:
             raise ValueError("No split documents available.")
 
-        if self.persist_directory:
-            os.makedirs(self.persist_directory, exist_ok=True)
+        # Qdrant 설정 (필요에 따라 값 수정)
+        qdrant_host = "localhost"
+        qdrant_port = 6333
+        collection_name = "pdf_docs"
 
-            if os.path.exists(self.persist_directory) and any(
-                os.listdir(self.persist_directory)
-            ):
-                print(f"Loading existing vector store: {self.persist_directory}")
+        client = QdrantClient(host=qdrant_host, port=qdrant_port)
 
-                return Chroma(
-                    persist_directory=self.persist_directory,
-                    embedding_function=self.create_embedding(),
-                )
+        print("Creating/loading Qdrant vector store...")
 
-        print("Creating new vector store...")
-
-        vectorstore = Chroma.from_documents(
+        vectorstore = Qdrant.from_documents(
             documents=split_docs,
             embedding=self.create_embedding(),
-            persist_directory=self.persist_directory,
+            url=f"http://{qdrant_host}:{qdrant_port}",
+            collection_name=collection_name,
+            prefer_grpc=False,
         )
 
         return vectorstore

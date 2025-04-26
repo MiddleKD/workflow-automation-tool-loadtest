@@ -15,4 +15,6 @@ dependencies = [
     "rank-bm25==0.2.2",
     "uvicorn==0.34.0",
     "locust>=2.11.1",
+    "qdrant-client>=1.8.2",
+    "langchain-ollama==0.3.2",
 ]

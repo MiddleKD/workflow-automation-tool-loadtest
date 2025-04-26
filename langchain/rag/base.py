@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever

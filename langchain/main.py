@@ -5,7 +5,7 @@ from typing import List
 import config
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from langchain_community.llms.ollama import Ollama
+from langchain_ollama import OllamaLLM
 from langchain_core.documents import Document
 from pydantic import BaseModel
 from rag import PDFRetrievalChain
@@ -18,11 +18,8 @@ DATA_DIR = Path(os.getenv("DATA_DIR", config.DATA_DIR))
 pdf_files = list(DATA_DIR.glob("*.pdf"))
 pdf_paths = [str(path) for path in pdf_files]
 
-VECTOR_DIR = Path(os.getenv("VECTOR_DIR", config.VECTOR_DIR))
-
 rag_chain = PDFRetrievalChain(
     source_uri=pdf_paths,
-    persist_directory=str(VECTOR_DIR),
     k=config.DEFAULT_TOP_K,
     embedding_model=config.DEFAULT_EMBEDDING_MODEL,
 ).initialize()
@@ -87,7 +84,7 @@ async def chat(request: SearchRequest):
         context_text = "\n".join([doc.page_content for doc in context_results])
         # 2. LLM 프롬프트 구성
         prompt = f"""{request.query} {context_text}"""
-        llm = Ollama(model=config.DEFAULT_LLM, num_predict=128)
+        llm = OllamaLLM(model=config.DEFAULT_LLM, num_predict=128)
         answer = llm.invoke(prompt)
         return answer
     except Exception as e:
