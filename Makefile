@@ -34,7 +34,7 @@ ollama-down:
 	docker stop ollama || true
 	docker rm ollama || true
 
-langchain:
+langchain-up:
 	uvicorn main:app --host 0.0.0.0 --port 8000 --app-dir langchain
 
 n8n-pdf-init:
@@ -53,4 +53,4 @@ loadtest:
 		*) echo "Invalid input" ;; \
 	esac
 
-.PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-log ollama-down langchain n8n-pdf-init loadtest
+.PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-log ollama-down langchain-up n8n-pdf-init loadtest
