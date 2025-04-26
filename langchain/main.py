@@ -87,17 +87,8 @@ async def chat(request: SearchRequest):
         context_results = rag_chain.search_semantic(request.query, request.top_k)
         context_text = "\n".join([doc.page_content for doc in context_results])
         # 2. LLM 프롬프트 구성
-        prompt = f"""
-        [문서 요약 및 답변 생성]
-        아래는 사용자의 질문입니다.
-        질문: {request.query}
-        ---
-        아래는 관련 PDF에서 추출된 문서 내용입니다.
-        {context_text}
-        ---
-        위 문서 내용을 참고하여 질문에 대해 친절하게 답변해 주세요.
-        """
-        llm = Ollama(model=config.DEFAULT_LLM)
+        prompt = f"""{request.query} {context_text}"""
+        llm = Ollama(model=config.DEFAULT_LLM, num_predict=128)
         answer = llm.invoke(prompt)
         return answer
     except Exception as e:
