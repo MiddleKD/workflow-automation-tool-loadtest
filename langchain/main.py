@@ -1,15 +1,14 @@
 import os
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from typing import List
 
-from dotenv import load_dotenv
-from langchain_core.documents import Document
-
-from rag import PDFRetrievalChain
 import config
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException
 from langchain_community.llms.ollama import Ollama
+from langchain_core.documents import Document
+from pydantic import BaseModel
+from rag import PDFRetrievalChain
 
 load_dotenv()
 
@@ -22,10 +21,10 @@ pdf_paths = [str(path) for path in pdf_files]
 VECTOR_DIR = Path(os.getenv("VECTOR_DIR", config.VECTOR_DIR))
 
 rag_chain = PDFRetrievalChain(
-    source_uri = pdf_paths,
-    persist_directory = str(VECTOR_DIR),
-    k = config.DEFAULT_TOP_K,
-    embedding_model = config.DEFAULT_EMBEDDING_MODEL
+    source_uri=pdf_paths,
+    persist_directory=str(VECTOR_DIR),
+    k=config.DEFAULT_TOP_K,
+    embedding_model=config.DEFAULT_EMBEDDING_MODEL,
 ).initialize()
 
 
@@ -98,10 +97,10 @@ async def chat(request: SearchRequest):
 def format_search_results(docs: List[Document]) -> str:
     """
     Format search results as markdown.
-    
+
     Args:
         docs: List of documents to format
-        
+
     Returns:
         Markdown formatted search results
 
@@ -109,17 +108,17 @@ def format_search_results(docs: List[Document]) -> str:
 
     if not docs:
         return "No relevant information found."
-    
+
     markdown_results = "## Search Results\n\n"
-    
+
     for i, doc in enumerate(docs, 1):
         source = doc.metadata.get("source", "Unknown source")
         page = doc.metadata.get("page", None)
         page_info = f" (Page: {page+1})" if page is not None else ""
-        
+
         markdown_results += f"### Result {i}{page_info}\n\n"
         markdown_results += f"{doc.page_content}\n\n"
         markdown_results += f"Source: {source}\n\n"
         markdown_results += "---\n\n"
-    
+
     return markdown_results

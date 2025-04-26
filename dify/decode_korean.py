@@ -1,5 +1,6 @@
-import sys
 import json
+import sys
+
 
 def decode_korean_text(json_obj, field_path):
     """
@@ -10,6 +11,7 @@ def decode_korean_text(json_obj, field_path):
     for key in field_path:
         val = val[key]
     return val
+
 
 if __name__ == "__main__":
     data = json.load(sys.stdin)
