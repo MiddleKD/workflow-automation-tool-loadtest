@@ -1,0 +1,231 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: workflow
+  name: pdf chat
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:0.0.5@cc38c90a58d4b4e43c9a821d352829b2c2a8d6d742de9fec9e61e6b34865b496
+kind: app
+version: 0.2.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: end
+      id: 1745636248816-source-1745638230730-target
+      source: '1745636248816'
+      sourceHandle: source
+      target: '1745638230730'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: knowledge-retrieval
+      id: 1745636193372-source-1745638344151-target
+      source: '1745636193372'
+      sourceHandle: source
+      target: '1745638344151'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: llm
+      id: 1745638344151-source-1745636248816-target
+      source: '1745638344151'
+      sourceHandle: source
+      target: '1745636248816'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 시작
+        type: start
+        variables:
+        - label: query
+          max_length: 512
+          options: []
+          required: true
+          type: paragraph
+          variable: query
+      height: 90
+      id: '1745636193372'
+      position:
+        x: 536.7321184016052
+        y: 37.89053709907385
+      positionAbsolute:
+        x: 536.7321184016052
+        y: 37.89053709907385
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1745638344151'
+          - result
+        desc: ''
+        model:
+          completion_params:
+            num_predict: 128
+          mode: chat
+          name: llama3.1:latest
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: a832d4fe-2773-4d20-938b-de8adb895459
+          role: system
+          text: you are a helpful assistant.
+        - id: 085ae35e-325f-4b2d-aa1b-ac736e5e1ba8
+          role: user
+          text: '{{#1745636193372.query#}} {{#context#}}'
+        selected: false
+        structured_output_enabled: false
+        title: LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1745636248816'
+      position:
+        x: 536.7321184016052
+        y: 195.69746869072964
+      positionAbsolute:
+        x: 536.7321184016052
+        y: 195.69746869072964
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - '1745636248816'
+          - text
+          variable: text
+        selected: false
+        title: 끝
+        type: end
+      height: 90
+      id: '1745638230730'
+      position:
+        x: 889.1336802851338
+        y: 195.69746869072964
+      positionAbsolute:
+        x: 889.1336802851338
+        y: 195.69746869072964
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        dataset_ids:
+        - /Hbghbi+32IJaVndooCT8xj9fEeaW/X4IBRQ75TC4TBiKNgsAj3pmp/aqWzXExyW
+        desc: ''
+        metadata_filtering_mode: disabled
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: weighted_score
+          reranking_model:
+            model: ''
+            provider: ''
+          score_threshold: null
+          top_k: 5
+          weights:
+            keyword_setting:
+              keyword_weight: 0
+            vector_setting:
+              embedding_model_name: llama3.1:latest
+              embedding_provider_name: langgenius/ollama/ollama
+              vector_weight: 1
+        query_variable_selector:
+        - '1745636193372'
+        - query
+        retrieval_mode: multiple
+        selected: false
+        title: 지식 검색
+        type: knowledge-retrieval
+      height: 92
+      id: '1745638344151'
+      position:
+        x: 884.6336802851338
+        y: 37.89053709907385
+      positionAbsolute:
+        x: 884.6336802851338
+        y: 37.89053709907385
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: -828.4848249278059
+      y: 97.42801107441713
+      zoom: 2

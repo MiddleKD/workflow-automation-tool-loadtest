@@ -4,18 +4,12 @@ n8n-up:
 		-v $(PWD)/n8n/datas:/home/node/.n8n \
 		docker.n8n.io/n8nio/n8n:latest
 
-n8n-log:
-	docker logs -f n8n
-
 n8n-down:
 	docker stop n8n || true
 
 
 dify-up:
 	docker compose --env-file dify/.env -f dify/docker/docker-compose.yaml up
-
-dify-log:
-	docker compose -f dify/docker/docker-compose.yaml logs -f
 
 dify-down:
 	docker compose -f dify/docker/docker-compose.yaml down
@@ -55,10 +49,10 @@ loadtest:
 	esac
 
 qdrant-up:
-	docker run --name qdrant -p 6333:6333 -p 6334:6334 qdrant/qdrant
+	docker run --name docker-qdrant-1 -p 6333:6333 -p 6334:6334 qdrant/qdrant
 
 qdrant-down:
-	docker stop qdrant || true
-	docker rm qdrant || true
+	docker stop docker-qdrant-1 || true
+	docker rm docker-qdrant-1 || true
 
-.PHONY: n8n-up n8n-down n8n-log dify-up dify-log dify-down ollama-up ollama-down langchain-up n8n-pdf-init loadtest qdrant-up qdrant-down
+.PHONY: n8n-up n8n-down dify-up dify-down ollama-up ollama-down langchain-up n8n-pdf-init loadtest qdrant-up qdrant-down

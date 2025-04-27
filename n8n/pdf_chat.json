@@ -4,7 +4,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "18495ef3-f041-4627-bb33-ac5b277cb763",
+        "path": "=chat",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -17,19 +17,6 @@
       "id": "c4ffbed1-3e67-4d63-abd4-c83aa228bd00",
       "name": "Webhook",
       "webhookId": "18495ef3-f041-4627-bb33-ac5b277cb763"
-    },
-    {
-      "parameters": {
-        "memoryKey": "n8n_pdf_store"
-      },
-      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
-      "typeVersion": 1.1,
-      "position": [
-        300,
-        80
-      ],
-      "id": "9619892b-adc0-4a09-9662-257af5dd1134",
-      "name": "Simple Vector Store"
     },
     {
       "parameters": {
@@ -62,7 +49,9 @@
     {
       "parameters": {
         "model": "llama3.1:latest",
-        "options": {}
+        "options": {
+          "numPredict": 128
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.lmOllama",
       "typeVersion": 1,
@@ -114,7 +103,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "b1ce616a-a54b-4ea9-8b13-1055fdd6db75",
+        "path": "upload",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
@@ -148,22 +137,8 @@
     },
     {
       "parameters": {
-        "mode": "insert",
-        "memoryKey": "n8n_pdf_store"
-      },
-      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
-      "typeVersion": 1.1,
-      "position": [
-        440,
-        400
-      ],
-      "id": "bf89e4ee-8744-4a13-893d-76962401418f",
-      "name": "Simple Vector Store2"
-    },
-    {
-      "parameters": {
-        "jsonMode": "expressionData",
-        "jsonData": "={{ $json.text }}",
+        "dataType": "binary",
+        "loader": "pdfLoader",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
@@ -177,7 +152,7 @@
     },
     {
       "parameters": {
-        "chunkSize": 600,
+        "chunkSize": 450,
         "chunkOverlap": 50
       },
       "type": "@n8n/n8n-nodes-langchain.textSplitterTokenSplitter",
@@ -191,32 +166,57 @@
     },
     {
       "parameters": {
-        "operation": "pdf",
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "n8n-pdf-docs",
+          "mode": "id"
+        },
         "options": {}
       },
-      "type": "n8n-nodes-base.extractFromFile",
-      "typeVersion": 1,
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
       "position": [
-        140,
+        360,
         400
       ],
-      "id": "d01afcea-d0c1-48cb-aa27-121693cb9dd9",
-      "name": "Extract from File"
+      "id": "20b7f30f-b3cb-4b26-a588-cad7948bc5fc",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "2EJMbEG3vRJJXWM7",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "n8n-pdf-docs",
+          "mode": "list",
+          "cachedResultName": "n8n-pdf-docs"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.1,
+      "position": [
+        280,
+        80
+      ],
+      "id": "20e127a9-a52b-4693-a017-c3d6c5dee219",
+      "name": "Qdrant Vector Store1",
+      "credentials": {
+        "qdrantApi": {
+          "id": "2EJMbEG3vRJJXWM7",
+          "name": "QdrantApi account"
+        }
+      }
     }
   ],
   "pinData": {},
   "connections": {
-    "Simple Vector Store": {
-      "ai_vectorStore": [
-        [
-          {
-            "node": "Vector Store Retriever",
-            "type": "ai_vectorStore",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Vector Store Retriever": {
       "ai_retriever": [
         [
@@ -254,7 +254,7 @@
       "ai_embedding": [
         [
           {
-            "node": "Simple Vector Store",
+            "node": "Qdrant Vector Store1",
             "type": "ai_embedding",
             "index": 0
           }
@@ -276,7 +276,7 @@
       "main": [
         [
           {
-            "node": "Extract from File",
+            "node": "Qdrant Vector Store",
             "type": "main",
             "index": 0
           }
@@ -287,7 +287,7 @@
       "ai_embedding": [
         [
           {
-            "node": "Simple Vector Store2",
+            "node": "Qdrant Vector Store",
             "type": "ai_embedding",
             "index": 0
           }
@@ -298,7 +298,7 @@
       "ai_document": [
         [
           {
-            "node": "Simple Vector Store2",
+            "node": "Qdrant Vector Store",
             "type": "ai_document",
             "index": 0
           }
@@ -316,28 +316,23 @@
         ]
       ]
     },
-    "Simple Vector Store2": {
-      "main": [
-        []
-      ]
-    },
-    "Extract from File": {
-      "main": [
+    "Qdrant Vector Store1": {
+      "ai_vectorStore": [
         [
           {
-            "node": "Simple Vector Store2",
-            "type": "main",
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
             "index": 0
           }
         ]
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "53198656-88d9-4a09-a806-f5edb68ab662",
+  "versionId": "83b43587-6b5c-4952-8c7f-c0c15e2e283e",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "cd761a66662a6ed34186713f65997734ec72fbd8c22d9ea769b294841dcbbc8a"
