@@ -17,7 +17,7 @@ dify-down:
 
 ollama-up:
 	docker run -d --gpus=all \
-	  -v /home/middlek/Desktop/mnt/sda/models/ollama:/root/.ollama \
+	  -v ./ollama/models:/root/.ollama \
 	  -v ./ollama/modelfiles:/root/modelfiles \
 	  -p 11434:11434 \
 	  -e OLLAMA_KV_CACHE_TYPE=1 \
